@@ -23,7 +23,7 @@ The system follows a two-phase process: **1. Indexing** and **2. Querying**.
 1.  **Semantic Search**: When a user enters a query, a `sentence-transformer` model converts it into a vector embedding. This embedding is used to find the most semantically similar `Offense` node in the Neo4j graph.
 2.  **Context Retrieval**: Once the most relevant offense is identified, the system queries the Neo4j graph to retrieve all connected information (the chapter, section, and punishment details). This retrieved data serves as the "context".
 3.  **Answer Generation**: The context and the original query are passed to the LLM with a carefully crafted prompt. The LLM then generates a final, human-readable, and structured legal explanation based *only* on the retrieved context.
-4.  **Interactive UI**: The entire process is wrapped in a user-friendly **Gradio** web interface, which shows the final answer and the step-by-step processing logs.
+4.  **Interactive UI**: web interface, which shows the final answer and the step-by-step processing logs.
 
 ## ✨ Features
 
@@ -40,97 +40,7 @@ The system follows a two-phase process: **1. Indexing** and **2. Querying**.
 -   **Knowledge Graph**: Neo4j
 -   **PDF Processing**: `PyPDFLoader`
 -   **Semantic Search**: `sentence-transformers`
--   **Web UI**: Gradio
-
-## 🚀 Getting Started
-
-Follow these steps to set up and run the project locally.
-
-### 1. Prerequisites
-
--   Python 3.8+
--   A Neo4j instance (You can use a free [Neo4j AuraDB instance](https://neo4j.com/cloud/aura/) or a local Docker container).
--   A Groq API Key (Get one for free at [GroqCloud](https://console.groq.com/keys)).
-
-### 2. Installation
-
-1.  **Clone the repository:**
-    ```bash
-    git clone <url>
-    cd GraphRAG-on-Bharatiya-Nyaya-Sanhita-BNS
-    ```
-
-2.  **Create a virtual environment and activate it:**
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-    ```
-
-3.  **Install the required dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-    *(You can create a `requirements.txt` file with the packages from the script: `langchain-community`, `pypdf`, `transformers`, `nltk`, `sentence_transformers`, `faiss-cpu`, `numpy`, `langchain_groq`, `gradio`, `neo4j`)*
-
-### 3. Configuration
-
-1.  **Place the PDF**: Download the Bharatiya Nyaya Sanhita (BNS) PDF and place it in the root directory of the project, naming it `BNS.pdf`.
-
-2.  **Set Environment Variables**: Create a `.env` file in the root directory or set the environment variables directly. The script will need:
-    -   `GROQ_API_KEY`: Your API key from Groq.
-    -   `NEO4J_URI`: The URI for your Neo4j database (e.g., `neo4j+s://xxxx.databases.neo4j.io`).
-    -   `NEO4J_USERNAME`: Your Neo4j username (e.g., `neo4j`).
-    -   `NEO4J_PASSWORD`: Your Neo4j password.
-
-3.  **Update the Script**: Modify the script to load these credentials securely. For example, in the `Graphclass`, update the `__init__` method:
-
-    ```python
-    import os
-    from dotenv import load_dotenv
-
-    load_dotenv()
-
-    class Graphclass:
-        def __init__(self, database="neo4j"):
-            self.uri = os.getenv("NEO4J_URI")
-            self.user = os.getenv("NEO4J_USERNAME")
-            self.password = os.getenv("NEO4J_PASSWORD")
-            # ... rest of the code
-    ```
-    Do the same for the `Inference` class to load the `GROQ_API_KEY`.
-
-### 4. Usage
-
-The script is designed to be run once for setup and then used for querying via the Gradio app.
-
-1.  **Run the Indexing Pipeline (First Time Only)**:
-    Uncomment the lines at the bottom of the script that perform the one-time setup:
-    ```python
-    # --- ONE-TIME SETUP ---
-    # 1. Load and chunk the PDF
-    pdf_handler = PDFFunctions()
-    chunks = pdf_handler.pdf_to_chunks(["/BNS.pdf"])
-
-    # 2. Extract structured tuples using the LLM
-    inference_engine = Inference(api_key=os.getenv("GROQ_API_KEY"))
-    tuples = inference_engine.extract_custom_tuples(chunks)
-    inference_engine.save_tuples_to_file(tuples, "graphData.txt") # Optional: save for backup
-
-    # 3. Build the Neo4j knowledge graph
-    graph_builder = Graphclass()
-    graph_builder.create_knowledge_graph(tuples)
-    print("Knowledge graph has been successfully built.")
-    # --- END OF SETUP ---
-    ```
-    Run the script once to populate your Neo4j database. After it completes, you can comment out these lines again.
-
-2.  **Launch the Gradio App**:
-    Make sure the setup lines are commented out, and then run the script. The Gradio application will start.
-    ```bash
-    python your_script_name.py
-    ```
-    Open the local URL provided in your terminal (e.g., `http://127.0.0.1:7860`) to access the web interface.
-
+  
 ## 💡 Future Improvements
 
 - **Accuracy Optimization**: Enhance retrieval and reasoning precision by refining graph queries, embeddings, and prompt structure.

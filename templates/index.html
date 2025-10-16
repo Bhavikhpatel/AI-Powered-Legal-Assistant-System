@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphRAG - Bharatiya Nyaya Sanhita Legal Assistant</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI-Powered Legal Assistant System</h1>
+            <p class="subtitle">Bharatiya Nyaya Sanhita Knowledge Graph RAG System</p>
+        </header>
+
+        <!-- About This Project Section -->
+        <section class="info-section">
+            <div class="info-container">
+                <button id="toggleInfoBtn" class="info-toggle-btn">
+                    About This Project
+                    <span class="arrow">▼</span>
+                </button>
+                
+                <div id="infoContent" class="info-content" style="display: none;">
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h3>What is This Project?</h3>
+                            <p>
+                                This is a <strong>Retrieval-Augmented Generation (RAG) system</strong> built specifically for the 
+                                Bharatiya Nyaya Sanhita (BNS) - India's new criminal code. The system automatically parses 
+                                the BNS PDF document and structures it into a <strong>Neo4j knowledge graph</strong>, where 
+                                legal offenses, chapters, sections, and punishments are interconnected as nodes and relationships.
+                            </p>
+                            <p>
+                                Using <strong>semantic search</strong> powered by AI embeddings and a <strong>Large Language Model (LLM)</strong>, 
+                                the system understands your legal questions in natural language and provides accurate, 
+                                contextual answers grounded in the actual BNS text.
+                            </p>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>How to Use It</h3>
+                            <ol>
+                                <li><strong>Enter Your Query:</strong> Type or paste a legal question, news article, or crime scenario in the text area below.</li>
+                                <li><strong>Click Analyze:</strong> The system will process your query in real-time, showing step-by-step progress.</li>
+                                <li><strong>Review Results:</strong> You'll see:
+                                    <ul>
+                                        <li>The most relevant BNS offense matched to your query</li>
+                                        <li>The similarity score (confidence level)</li>
+                                        <li>Complete legal context from the knowledge graph</li>
+                                        <li>A structured interpretation with chapter, section, and punishment details</li>
+                                    </ul>
+                                </li>
+                                <li><strong>View BNS Copy:</strong> Use the button below to access the full BNS PDF for reference.</li>
+                            </ol>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>Applications & Use Cases</h3>
+                            <ul>
+                                <li><strong>Legal Research:</strong> Quickly find relevant BNS sections for specific offenses without manual searching through hundreds of pages.</li>
+                                <li><strong>News Analysis:</strong> Paste crime-related news articles to identify applicable legal provisions and potential punishments.</li>
+                                <li><strong>Legal Education:</strong> Law students can explore connections between different offenses, chapters, and legal concepts interactively.</li>
+                                <li><strong>Citizen Awareness:</strong> General public can understand their legal rights and consequences of various offenses under BNS.</li>
+                                <li><strong>Case Preparation:</strong> Legal professionals can use it for preliminary research to identify relevant sections and precedents.</li>
+                                <li><strong>Compliance & Advisory:</strong> Organizations can quickly check legal implications of specific scenarios or employee conduct.</li>
+                            </ul>
+                        </div>
+
+                        <div class="info-card tech-stack">
+                            <h3>Technology Stack</h3>
+                            <div class="tech-badges">
+                                <span class="badge">Neo4j Knowledge Graph</span>
+                                <span class="badge">LangChain</span>
+                                <span class="badge">Groq LLM API</span>
+                                <span class="badge">Sentence Transformers</span>
+                                <span class="badge">Flask Backend</span>
+                                <span class="badge">Python</span>
+                                <span class="badge">JavaScript</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <main>
+            <!-- BNS PDF Viewer Section -->
+            <section class="pdf-section">
+                <button id="togglePdfBtn" class="btn-secondary">
+                Show Bharatiya Nyaya Sanhita Copy
+                </button>
+                
+                <div id="pdfViewerContainer" class="pdf-viewer-container" style="display: none;">
+                    <div class="pdf-controls">
+                        <a href="/static/BNS.pdf" download class="btn-download">Download PDF</a>
+                    </div>
+                    <embed 
+                        id="pdfViewer" 
+                        src="/static/BNS.pdf" 
+                        type="application/pdf" 
+                        width="100%" 
+                        height="600px"
+                    >
+                </div>
+            </section>
+
+            <!-- Query Input Section -->
+            <section class="input-section">
+                <h2>Enter Legal Query or News Article</h2>
+                <textarea 
+                    id="queryInput" 
+                    placeholder="Enter a legal question or paste a news article describing a crime or legal scenario...
+
+Example: 
+- 'A person stole a car from a parking lot'
+- 'What is the punishment for theft?'
+- 'Someone threatened me with violence, what legal action can I take?'"
+                    rows="6"
+                ></textarea>
+                <button id="analyzeBtn" class="btn-primary">
+                    <span class="btn-text">🔍 Analyze</span>
+                    <span class="loader" style="display: none;"></span>
+                </button>
+            </section>
+
+            <!-- Processing Logs Section -->
+            <section class="logs-section" style="display: none;">
+                <h2>Processing Status</h2>
+                <div class="logs-box" id="logsBox">
+                    <p class="log-item">Ready...</p>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" style="display: none;">
+                <div class="matched-node-box" id="matchedNodeBox" style="display: none;">
+                    <h3>Matched Offense</h3>
+                    <div class="node-content">
+                        <p><strong>Offense:</strong> <span id="nodeName"></span></p>
+                        <p><strong>Similarity Score:</strong> <span id="similarityScore"></span></p>
+                    </div>
+                </div>
+
+                <div class="context-box" id="contextBox" style="display: none;">
+                    <h3>Retrieved Context</h3>
+                    <details>
+                        <summary>View Retrieved Legal Context</summary>
+                        <pre id="contextContent"></pre>
+                    </details>
+                </div>
+
+                <div class="answer-box" id="answerBox" style="display: none;">
+                    <h3>Legal Interpretation</h3>
+                    <div class="answer-content" id="answerContent"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            
+            <p class="disclaimer">⚠️ Disclaimer: This tool is for informational purposes only and does not constitute legal advice. Consult a qualified legal professional for specific legal matters.</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

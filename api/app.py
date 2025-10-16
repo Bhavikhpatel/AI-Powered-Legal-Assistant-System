@@ -197,6 +197,6 @@ if __name__ == '__main__':
     print("🌐 Access the app at: http://127.0.0.1:5000")
     
     # Initialize components before starting the server
-    initialize_components()
+    # initialize_components()
     
     app.run(debug=True, host='0.0.0.0', port=5000)

@@ -1,33 +1,9 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "api/app.py",
-      "use": "@vercel/python"
+      "source": "/(.*)",
+      "destination": "/api/app"
     }
-  ],
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "api/app.py"
-    }
-  ],
-  "functions": {
-    "api/**/*.py": {
-      "memory": 3008,
-      "maxDuration": 300,
-      "excludeFiles": "{tests/**,__tests__/**,**/*.test.py,**/test_*.py,fixtures/**,__fixtures__/**,testdata/**,sample-data/**}"
-    }
-  },
-  "env": {
-    "GROQ_API_KEY": "@groq_api_key",
-    "NEO4J_URI": "@neo4j_uri",
-    "NEO4J_USERNAME": "@neo4j_username",
-    "NEO4J_PASSWORD": "@neo4j_password"
-  }
+  ]
 }

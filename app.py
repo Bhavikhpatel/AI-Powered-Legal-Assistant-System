@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, Response
+from flask import Flask, request, jsonify, render_template, Response, send_from_directory
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
@@ -9,7 +9,8 @@ load_dotenv()
 
 app = Flask(__name__, 
             template_folder='templates',
-            static_folder='static')
+            static_folder='public',
+            static_url_path='')
 
 CORS(app)
 
@@ -42,11 +43,22 @@ initialize_system()
 
 @app.route('/')
 def index():
+    """Serve main HTML page"""
     return render_template('index.html')
+
+
+@app.route('/<path:path>')
+def serve_static(path):
+    """Serve static files from public folder"""
+    try:
+        return send_from_directory('public', path)
+    except Exception as e:
+        return jsonify({"error": f"File not found: {path}"}), 404
 
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
+    """Health check endpoint"""
     return jsonify({
         "status": "healthy",
         "graph_connected": graph_query is not None,

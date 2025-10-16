@@ -2,8 +2,16 @@
   "version": 2,
   "rewrites": [
     {
+      "source": "/(css|js|images)/(.*)",
+      "destination": "/public/$1/$2"
+    },
+    {
+      "source": "/BNS.pdf",
+      "destination": "/public/BNS.pdf"
+    },
+    {
       "source": "/(.*)",
-      "destination": "app"
+      "destination": "/app.py"
     }
   ]
 }
